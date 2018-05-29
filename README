@@ -1,0 +1,14 @@
+ColoradoPM-Krige
+	Github repository for scripts used to krige daily PM2.5 concentrations from EPA AQS monitors in the Colorado Front Range. 
+
+This folder contains the following python scripts:
+
+eval_kriging.py - makes figures to evaluate kriging output
+
+find_VGPparams_DEN.py - used to find the kriging variogram parameters
+
+krige_aqs_DEN_mtncutoff.py - script where data is kriged
+
+npz2netCDF.py - takes npz files output by kriging code and writes a netCDF file
+
+sample_grid.py - plot the kriging grid
