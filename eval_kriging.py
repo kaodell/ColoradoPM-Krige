@@ -17,7 +17,7 @@ from scipy.stats import linregress
 ###################################################################################################
 # set year, load data and make datetime array
 ###################################################################################################
-year = 2016
+year = 2010
 
 t0 = dt.datetime( year = year, month = 1, day = 1 )
 tf = dt.datetime( year = year, month = 12, day = 31 )
@@ -27,7 +27,7 @@ alldays[0] = t0
 for i in range(1, NT+1):
 	alldays[i] = alldays[i-1] + dt.timedelta(days = 1)
 
-fname =  '/home/kaodell/nasa_fires/Sheena_Den3kmKrige/processed_datafiles/kpmDEN'+ str(year) + '_3km.npz'
+fname =  '/home/kaodell/nasa_fires/Sheena_Den3kmKrige/updated/kpmDEN'+ str(year) + '_3km_update.npz'
 fid = np.load(fname,'r')
 kPM = fid['kPM']
 sPMin = fid['sPMin']
@@ -104,7 +104,7 @@ pl.title('Colorado kriging grid and surface sites')
 pl.savefig('/home/kaodell/nasa_fires/Sheena_Den3kmKrige/figures/' + str(year) + 'COmtncutoff.png')
 #pl.show()
 
-
+'''
 ###################################################################################################
 # determine r2 at each site over time period and plot
 ###################################################################################################
@@ -124,7 +124,7 @@ for si in range(sPMin.shape[1]):
 
 	slope, intercept, rvalue, pvalue, stderr = linregress( dsx,dsy )
 	rsq[si] = rvalue**2.
-
+'''
 pl.figure()
 m = Basemap(projection='merc',lon_0=-129,llcrnrlat=36,urcrnrlat=41.5,\
     llcrnrlon=-110,urcrnrlon=-100,lat_ts=10,resolution='l')
@@ -185,7 +185,7 @@ ax.spines['right'].set_visible(False)
 pl.xlabel('# days with data',fontsize=12)
 pl.ylabel('R$^2$',fontsize=12)
 pl.title('R$^2$ and # avail days at sites, ' + str(year))
-pl.savefig('/home/kaodell/nasa_fires/Sheena_Den3kmKrige/figures/' + str(year) + 'COmtncutoff_rsq_ndays.png')
+pl.savefig('/home/kaodell/nasa_fires/Sheena_Den3kmKrige/updated/' + str(year) + 'COmtncutoff_rsq_ndays.png')
 #pl.show()
 
 # map of site locations
@@ -205,7 +205,7 @@ cs = m.scatter(NOCOx,NOCOy, marker = 'o', facecolor = 'none',edgecolor = 'purple
 cs = m.scatter(WYx,WYy, marker = 'o', facecolor = 'none',edgecolor = 'forestgreen' ,s=55)
 cs = m.scatter(CS_Px,CS_Py, marker = 'o', facecolor = 'none',edgecolor = 'indianred' ,s=55)
 pl.title('Colorado sites ' + str(year))
-pl.savefig('/home/kaodell/nasa_fires/Sheena_Den3kmKrige/figures/' + str(year) + 'COmtncutoff_sites.png')
+pl.savefig('/home/kaodell/nasa_fires/Sheena_Den3kmKrige/updated/' + str(year) + 'COmtncutoff_sites.png')
 pl.show()
 
 
