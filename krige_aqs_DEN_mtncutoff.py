@@ -307,7 +307,7 @@ for ti in range(NT):
 # save output
 fname = '/home/kaodell/nasa_fires/Sheena_Den3kmKrige/updated/kpmDEN'+ str(year) + '_3km_update.npz'
 f = open(fname, 'w')
-np.savez(f, alldays=alldays, kPM=kPM,ASites=ASites,glats=glats,glons=glons,kRSQ=kRSQ,sPMin=sPMin,\
+np.savez(f, alldays=alldays, kPM=kPM,glats=glats,glons=glons,kRSQ=kRSQ,sPMin=sPMin,\
 	sPMout=sPMout,ilon=ilon,ilat=ilat,olat=olat,olon=olon,slope=slope,kPM_site=kPM_site,\
 	intercept=intercept,rvalue=rvalue,pvalue=pvalue,stderr=stderr,rsq=rsq,MB=MB,MAE=MAE)
 f.close()
