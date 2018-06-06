@@ -12,11 +12,11 @@ import csv
 import sys
 ###################################################################################################
 # set year
-#year = 2012
+year = 2015
 
 #indicate include CDPHE data
 CDPHE = True
-
+'''
 # to run multiple years at once
 
 if len(sys.argv) > 1:
@@ -25,7 +25,7 @@ if len(sys.argv) > 1:
 	year = int(sys.argv[1])
 else:
 	print 'no'
-
+'''
 ###################################################################################################
 #Time period of interest
 ###################################################################################################
@@ -137,7 +137,7 @@ if CDPHE:
 			continue
 		#pull only this years data	
 		if r[0][-2:] == str(year)[-2:]:
-			COpm25.append(r[2:18])
+			COpm25.append(r[2:19])
 
 	COpm25 = np.array(COpm25)
 
@@ -149,12 +149,12 @@ if CDPHE:
 
 	COpm25 = np.array(COpm25,dtype = 'float')
 
-	dailyCOpm25 = np.empty([len(alldays),16])
+	dailyCOpm25 = np.empty([len(alldays),17])
 	dailyCOpm25[:] = np.nan
 	dind = 0
 	for i in range(0,24*len(alldays),24):
 		dayPM = COpm25[i:i+24,:]
-		for j in range(16):
+		for j in range(17):
 			nmeas = len(np.where(np.isnan(dayPM[:,j]) == False )[0])
 			if nmeas >= 19:
 				dailyCOpm25[dind,j] = np.nanmean(dayPM[:,j])
@@ -164,13 +164,16 @@ if CDPHE:
 	# load site lat lons
 	clons = []
 	clats = []
-	fn4 = '/fischer-scratch/kaodell/surface_obs/cdphe_sites/pm2.5_colorado2010-2014_siteloc.csv'
+	fn4 = '/fischer-scratch/kaodell/surface_obs/cdphe_sites/pm2.5_colorado2009-2016_lyfix_locs.csv'
 	fid = open(fn4, 'rU')
 	ro = csv.reader(fid)
 	for r in ro:
 		clons.append(r[1])
 		clats.append(r[2])
-	
+	clons = np.array(clons)
+	rinds = np.where(clons =='')	
+	clons = np.delete(clons,rinds)
+	clats = np.delete(clats,rinds)
 	# make numpy arrays and remove header
 	clons = np.array(clons[1:],dtype = 'float')
 	clats = np.array(clats[1:],dtype = 'float')
@@ -218,32 +221,60 @@ lats = np.array(lats)
 ID = np.array(ID)
 ASites = np.array(ASites)
 
-
-if CDPHE:
-	# append CDPHE estimates and site locations
-	sPM = np.hstack([sPM,dailyCOpm25])
-	lons = np.hstack([lons,clons])
-	lats = np.hstack([lats,clats])
-
 #find and delete sites that have no data during the specified time frame
 #print nnan
 naninds = np.where(np.isnan(sPM)==True)
-
+COnaninds = np.where(np.isnan(dailyCOpm25)==True)
 count = []
+COcount = []
 for i in range(sPM.shape[1]):
 	count.append(len(np.where(naninds[1] == i)[0]))
+for j in range(dailyCOpm25.shape[1]):
+	COcount.append(len(np.where(COnaninds[1] == j)[0]))
 count = np.array(count)
+COcount = np.array(COcount)
 inds = np.where(count == NT)	# these are sites that have no data during the specified time frame
+COinds = np.where(COcount == NT)
 
 # delete these sites from the data
 sPM = np.delete(sPM,inds,axis=1)
 lons = np.delete(lons,inds)
 lats = np.delete(lats, inds)
+
+dailyCOpm25 = np.delete(dailyCOpm25, COinds, axis = 1)
+clons = np.delete(clons,COinds)
+clats = np.delete(clats, COinds)
+dailyCOpm25 = np.round(dailyCOpm25,1)
+sPM = np.round(sPM,1)
+if CDPHE:
+	# append CDPHE estimates and site locations
+
+	# first check the CDPHE site isn't already in the sPM array
+	for i in range(len(clats)):
+		#sinds = np.where(clats[i] == lats)[0]
+		#if len(sinds)>0:
+		for j in range(len(lons)):
+			# see if sites have matching obs (may not always have obs on same days bc
+			# of the way we averaged)
+			diff = abs(sPM[:,j] - dailyCOpm25[:,i])
+			nvals = len(np.where(np.isnan(diff)==False)[0])
+			if np.nansum(diff) == 0 and nvals > 0:
+				print  True, i , j
+
+	sPM = np.hstack([sPM,dailyCOpm25])
+	lons = np.hstack([lons,clons])
+	lats = np.hstack([lats,clats])
+
+
 #ASites = np.delete(ASites, inds)
 
 print len(naninds[0])
 print inds
 print sPM.shape[0]*sPM.shape[1] - len(pmraw)
+
+
+# save data
+
 
 #f = open('/home/kaodell/nasa_fires/processed_datafiles/US_multiyear_krige/sfc_pm' + str(year)[2:] + '.npz', 'w')
 #np.savez(f, sPM=sPM, lons=lons, lats=lats, ID=ID, ASites=ASites, errs=errs,nnan=nnan, pmraw=pmraw,NT=NT,NS=NS)
@@ -256,10 +287,15 @@ f.close()
 ####################################################################################################
 #optional: double check we don't have duplicate sites from CDPHE
 #####################################################################################################
-
-#for i in range(sPM.shape[0])
-
-
+#if CDPHE:
+	# makes nans -9999, this funciton can't work with nans
+#	nans = np.where(np.isnan(sPM)==True)
+#	sPM[nans] = -9999
+#	for i in range(lats.shape[0]):
+#		for j in range(lats.shape[0]):
+#			if np.array_equal(sPM[:,i],sPM[:,j]):
+#				if i != j:
+#					print i,j
 
 		
 
