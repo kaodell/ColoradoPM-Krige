@@ -1,3 +1,6 @@
+This code is outdated and should NOT be used. See krige_AQS_US code for the most up-to-date version. 
+- Kate O'Dell, 08.06.2021
+
 ColoradoPM-Krige
 	Github repository for scripts used to krige daily PM2.5 concentrations from EPA AQS monitors in the Colorado Front Range. 
 
